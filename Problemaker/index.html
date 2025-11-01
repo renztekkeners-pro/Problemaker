@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problemaker - Chapter 1 Update</title>
+    <!-- Impor Tailwind CSS untuk styling UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Impor Three.js untuk grafis 3D -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <!-- Import map HARUS tetap di HTML agar three.js dikenali oleh semua module -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+        }
+      }
+    </script>
+    <!-- Impor Font dari Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- [REFACTOR] Memuat file CSS eksternal -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <!-- UI Layers (Struktur HTML tetap sama) -->
+    <div id="start-screen" class="ui-layer" style="background-image: url('assets/MenuStartB.png');">
+        <div class="absolute bottom-20"><h2 class="start-text text-xl">PRESS ENTER BUTTON</h2></div>
+    </div>
+    <div id="loading-screen" class="ui-layer hidden" style="background-image: url('assets/LoadingB.png');">
+        <h1 class="text-4xl font-bold">Loading...</h1>
+    </div>
+    <div id="main-menu" class="ui-layer hidden items-end" style="background-image: url('assets/MainMenuB.png');">
+        <div class="absolute top-10 right-10 flex flex-col items-center">
+            <div id="menu-option-story" class="menu-option selected">Story Mode</div>
+            <div id="menu-option-play" class="menu-option">Classic Mode</div>
+            <div id="menu-option-bengkel" class="menu-option">Bengkel</div>
+            <div id="menu-option-shop-skin" class="menu-option">Shop Skin</div>
+            <div id="menu-option-exit" class="menu-option">Exit</div>
+        </div>
+    </div>
+    <div id="bengkel-screen" class="ui-layer hidden flex-col justify-start pt-20" style="background-image: url('assets/BengkelB.png');">
+        <h1 class="text-5xl font-bold mb-10" style="font-family: 'Cinzel', serif;">BENGKEL</h1>
+        <div id="stat-points-display" class="absolute top-5 left-5 p-4 bg-purple-900/80 border-2 border-purple-400 rounded-lg text-xl">
+            Poin Stat: <span id="stat-points-count">0</span>
+            <span class="block text-sm mt-1 text-gray-300">(Tekan 'P' untuk Stats)</span>
+        </div>
+        <div id="bengkel-items-container" class="w-full flex flex-col items-center overflow-y-auto"></div>
+        <p class="absolute bottom-10">Pilih dengan Atas/Bawah, Enter untuk mengatur. 'P' untuk Stats. ESC untuk kembali.</p>
+    </div>
+    <div id="stat-upgrade-screen" class="ui-layer hidden flex-col justify-start pt-20" style="background-color: rgba(0, 0, 0, 0.95);">
+        <h1 class="text-5xl font-bold mb-10" style="font-family: 'Cinzel', serif;">STAT POINTS</h1>
+        <div class="absolute top-5 right-5 p-4 bg-purple-900/80 border-2 border-purple-400 rounded-lg text-xl">
+            Poin Stat: <span id="stat-points-count-upgrade">0</span>
+        </div>
+        <div id="stat-items-container" class="w-full max-w-4xl flex flex-col items-center overflow-y-auto space-y-4 px-10">
+        </div>
+        <p class="absolute bottom-10">Gunakan Panah Atas/Bawah untuk memilih, Enter untuk upgrade. P atau ESC untuk kembali.</p>
+    </div>
+
+    <div id="equip-confirm-popup" class="ui-layer hidden" style="background-color: rgba(0, 0, 0, 0.9);">
+        <div class="bg-gray-800 p-8 rounded-lg text-center shadow-lg">
+            <h2 id="equip-confirm-item-name" class="text-2xl mb-6"></h2>
+            <div>
+                <span id="equip-confirm-option-yes" class="menu-option selected">Ya</span>
+                <span id="equip-confirm-option-no" class="menu-option">Batal</span>
+            </div>
+        </div>
+    </div>
+    <div id="notification-popup" class="notification-popup hidden"></div>
+
+    <div id="char-select-screen" class="ui-layer hidden" style="background-image: url('assets/CharSelectB.png');">
+        <h1 class="absolute top-10 text-4xl font-bold">PILIH KARAKTER</h1>
+        <div class="flex space-x-8">
+            <div id="char-select-0" class="menu-option selected">Joko</div>
+            <div id="char-select-1" class="menu-option">Riski</div>
+            <div id="char-select-2" class="menu-option">PNS</div>
+        </div>
+    </div>
+    <div id="stage-select-screen" class="ui-layer hidden" style="background-image: url('assets/BSelectB.png');">
+        <h1 class="absolute top-10 text-4xl font-bold">PILIH STAGE</h1>
+        <div class="flex space-x-8">
+            <div id="stage-select-0" class="menu-option selected">Halaman Sekolah</div>
+            <div id="stage-select-1" class="menu-option">Perumahan</div>
+        </div>
+    </div>
+    <div id="shop-skin-screen" class="ui-layer hidden flex-col justify-start pt-20" style="background-image: url('assets/SkinShopB.png');">
+        <h1 class="text-5xl font-bold mb-10" style="font-family: 'Cinzel', serif;">SKIN SHOP</h1>
+        <div id="gold-display-shop-skin" class="gold-display">Gold: 0</div>
+        <div id="shop-skin-items-container" class="w-full flex flex-col items-center overflow-y-auto"></div>
+        <p class="absolute bottom-10">Gunakan Panah Atas/Bawah untuk memilih, Enter untuk membeli. ESC untuk kembali.</p>
+    </div>
+    <div id="battle-shop-screen" class="ui-layer hidden justify-end" style="background-image: url('assets/BattleShopB.png'); background-color: rgba(0,0,0,0.7); background-blend-mode: darken;">
+        <div class="w-1/3 h-full flex flex-col items-center justify-center pr-10">
+            <h1 class="text-5xl font-bold mb-10" style="font-family: 'Cinzel', serif;">BATTLE SHOP</h1>
+            <div id="gold-display-shop-battle" class="gold-display">Gold: 0</div>
+            <div id="battle-shop-items-container" class="w-full flex flex-col items-center overflow-y-auto"></div>
+            <p class="absolute bottom-10">Tekan H atau ESC untuk kembali ke pertarungan.</p>
+        </div>
+    </div>
+    <div id="inventory-screen" class="ui-layer hidden" style="background-color: rgba(0, 0, 0, 0.8);">
+        <h1 class="text-4xl font-bold mb-8 absolute top-20">INVENTARIS</h1>
+        <div id="inventory-items-container" class="w-full flex flex-col items-center overflow-y-auto max-h-[70vh]"></div>
+        <p class="absolute bottom-10">Pilih item dengan Atas/Bawah, Enter untuk menggunakan. I atau ESC untuk menutup.</p>
+    </div>
+    <div id="item-confirm-popup" class="ui-layer hidden" style="background-color: rgba(0, 0, 0, 0.9);">
+        <div class="bg-gray-800 p-8 rounded-lg text-center shadow-lg">
+            <h2 id="confirm-item-name" class="text-2xl mb-6"></h2>
+            <div>
+                <span id="confirm-option-yes" class="menu-option selected">Iya</span>
+                <span id="confirm-option-no" class="menu-option">Tidak</span>
+            </div>
+        </div>
+    </div>
+    <div id="gameplay-ui" class="ui-layer hidden justify-start items-start" style="background: transparent;">
+        <div id="health-bar-wrapper" class="health-bar-container"><div id="health-bar"></div></div>
+        <div id="gold-display-gameplay" class="gold-display">Gold: 0</div>
+        <div class="absolute top-20 left-5 text-xl">Sisa Musuh: <span id="enemy-count">20</span></div>
+        <div class="absolute top-12 left-20 w-[300px] h-4 bg-black/50 border border-cyan-500 rounded-sm p-0.5">
+            <div id="xp-bar" class="h-full bg-cyan-400 transition-width duration-500" style="width: 0%;"></div>
+            <div class="absolute inset-0 flex justify-center items-center text-xs text-white" id="xp-text">Level 1 (0/100)</div>
+        </div>
+        <div class="absolute top-5 left-1/2 -translate-x-1/2 p-2 bg-black/50 rounded-md border border-yellow-500 cursor-pointer">
+            Battle Shop (H)
+        </div>
+        <div id="abilities-ui" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-4">
+            <div id="ability-barrage" class="ability-ui-element">3</div>
+            <div id="ability-lastpunch" class="ability-ui-element">4</div>
+            <div id="ability-barrier" class="ability-ui-element">B</div>
+            <div id="ability-barrage-fire" class="ability-ui-element hidden">T</div>
+        </div>
+        <div id="objective-ui" class="hidden">
+            <h2 id="objective-text" class=""></h2>
+        </div>
+    </div>
+    <div id="win-popup" class="ui-layer hidden" style="background-color: rgba(0, 0, 0, 0.7);">
+        <div class="bg-gray-800 p-10 rounded-lg text-center shadow-lg">
+            <h1 class="text-3xl mb-2">Kamu Menang!</h1>
+            <p id="win-reward-text" class="text-xl mb-6 text-yellow-400"></p>
+            <div>
+                <div id="win-option-menu" class="menu-option selected">Kembali Ke Menu Utama</div>
+                <div id="win-option-exit" class="menu-option">Keluar dari Game</div>
+            </div>
+        </div>
+    </div>
+    <div id="lose-popup" class="ui-layer hidden" style="background-color: rgba(0, 0, 0, 0.7);">
+        <div class="bg-gray-800 p-10 rounded-lg text-center shadow-lg border-2 border-red-500">
+            <h1 class="text-4xl text-red-500 mb-2">Kamu Kalah !</h1>
+            <p class="text-xl mb-6">Jangan Menyerah!</p>
+            <div>
+                <div id="lose-option-restart" class="menu-option selected">Ulangi</div>
+                <div id="lose-option-menu" class="menu-option">Menu Utama</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Mode UI Layers -->
+    <div id="story-intro-screen" class="ui-layer hidden">
+        <h1 class="text-6xl fade-in-text" style="font-family: 'Cinzel', serif;">Chapter 1</h1>
+        <h2 class="text-4xl fade-in-text" style="animation-delay: 1s;">Perfect Badluck</h2>
+        <p class="absolute bottom-20 text-xl start-text">Press ENTER</p>
+    </div>
+
+    <div id="transition-screen" class="ui-layer hidden" style="opacity: 0; background-color: #000;">
+        <h2 id="transition-text" class="text-4xl fade-in-text"></h2>
+    </div>
+
+    <div id="cutscene-ui" class="hidden">
+        <div id="dialog-speaker"></div>
+        <div id="dialog-text"></div>
+        <div id="dialog-prompt">(E) Lanjut</div>
+    </div>
+
+    <div id="story-complete-screen" class="ui-layer hidden flex-col text-center">
+        <h1 class="text-5xl fade-in-text">Chapter 1 : Perfect Badluck</h1>
+        <h2 class="text-3xl fade-in-text text-green-400" style="animation-delay: 1s;">COMPLETE!</h2>
+        <div class="fade-in-text text-xl mt-8 space-y-2" style="animation-delay: 2s;">
+            <p class="text-yellow-400">Reward: 500 Gold</p>
+            <p class="text-cyan-400">Reward: 1000 XP</p>
+            <p class="text-red-500">Ability Baru: Barrage Punch Fire (T)</p>
+        </div>
+        <p class="text-xl fade-in-text mt-4" style="animation-delay: 3s;">Prototype Version.</p>
+        <p class="text-2xl fade-in-text text-gray-400" style="animation-delay: 3.5s;">Chapter 2 Coming Soon!</p>
+        <div class="mt-20">
+            <div id="complete-option-menu" class="menu-option selected">Kembali Ke Menu Utama (Enter)</div>
+        </div>
+    </div>
+
+
+    <!-- Elemen Audio (Tetap di HTML) -->
+    <audio id="main-menu-music" src="assets/Music/MainMenu.mp3" loop></audio>
+    <audio id="char-select-music" src="assets/Music/CharSelect.mp3" loop></audio>
+    <audio id="halaman-sekolah-music" src="assets/Music/HalamanSekolah.mp3" loop></audio>
+    <audio id="perumahan-music" src="assets/Music/Perumahan.mp3" loop></audio>
+
+    <audio id="sfx-punch" src="assets/SFX/PunchSFX.mp3"></audio>
+    <audio id="sfx-damage" src="assets/SFX/DamageSFX.mp3"></audio>
+    <audio id="sfx-buy" src="assets/SFX/BuySFX.mp3"></audio>
+    <audio id="sfx-click" src="assets/SFX/ClickSFX.mp3"></audio>
+
+    <!-- [REFACTOR] Memuat file JavaScript module utama -->
+    <script type="module" src="main.js"></script>
+</body>
+</html>

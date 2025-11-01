@@ -1,0 +1,100 @@
+/* [REFACTOR] Semua CSS dipindahkan ke file eksternal style.css */
+body { margin: 0; overflow: hidden; background-color: #000; }
+canvas { display: none; } 
+.ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; color: white; font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; background-size: cover; background-position: center; }
+.hidden { display: none !important; }
+.start-text { font-family: 'Cinzel', serif; text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0077ff, 0 0 40px #0077ff; }
+.menu-option { padding: 8px 20px; margin: 10px; font-size: 1.5rem; border: 2px solid transparent; transition: all 0.2s ease-in-out; cursor: pointer; text-shadow: 1px 1px 2px black; }
+.menu-option.selected { border-color: white; background-color: rgba(255, 255, 255, 0.2); text-shadow: 0 0 5px #fff; }
+.health-bar-container { position: absolute; top: 20px; left: 20px; width: 300px; height: 30px; background-color: rgba(0,0,0,0.5); border: 2px solid #fff; border-radius: 5px; padding: 2px; }
+#health-bar { width: 100%; height: 100%; background-color: #4caf50; transition: width 0.5s ease-in-out, transform 0.1s; border-radius: 2px; }
+.gold-display { position: absolute; top: 20px; right: 20px; padding: 10px 20px; background-color: rgba(0,0,0,0.7); border: 2px solid #ffd700; border-radius: 8px; font-size: 1.2rem; }
+
+.shop-item, .inventory-item, .bengkel-item { background-color: rgba(0,0,0,0.8); border: 2px solid #aaa; padding: 15px; margin: 10px; width: 90%; max-width: 400px; border-radius: 10px; transition: all 0.2s; }
+.shop-item.selected, .inventory-item.selected, .bengkel-item.selected { border-color: #ffd700; transform: scale(1.05); }
+.shop-item.owned { border-color: #4caf50; background-color: rgba(76, 175, 80, 0.2); }
+.bengkel-item.equipped { border-color: #2196F3; background-color: rgba(33, 150, 243, 0.2); }
+.shop-item.disabled { border-color: #555; background-color: rgba(50, 50, 50, 0.5); color: #888; cursor: not-allowed; }
+
+.ability-ui-element { width: 64px; height: 64px; background-color: rgba(0,0,0,0.7); border: 2px solid #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; transition: all 0.2s; user-select: none; }
+.ability-ui-element.ready { background-color: rgba(76, 175, 80, 0.7); border-color: #fff; }
+.ability-ui-element.active { background-color: rgba(33, 150, 243, 0.7); border-color: #fff; box-shadow: 0 0 15px #2196F3; }
+.notification-popup { position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%); background-color: rgba(255, 69, 0, 0.9); padding: 15px 30px; border-radius: 10px; border: 2px solid #fff; font-size: 1.5rem; z-index: 1000; }
+
+#story-intro-screen, #transition-screen, #story-complete-screen { background-color: rgba(0, 0, 0, 1); transition: opacity 1.5s ease-in-out; }
+.fade-in-text { animation: fadeIn 3s ease-in forwards; opacity: 0; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+#cutscene-ui { position: absolute; bottom: 10%; left: 10%; right: 10%; background-color: rgba(0, 0, 0, 0.85); border: 2px solid #fff; border-radius: 15px; padding: 25px; z-index: 100; font-family: 'Arial', sans-serif; }
+#dialog-speaker { font-size: 1.8rem; font-weight: bold; color: white; margin-bottom: 10px; }
+#dialog-text { font-size: 1.5rem; line-height: 1.4; color: white; }
+#dialog-prompt { position: absolute; bottom: 20px; right: 25px; font-size: 1.1rem; color: #aaa; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+#objective-ui { 
+    position: absolute; 
+    top: 70px;
+    left: 20px;
+    transform: none;
+    background-color: rgba(0, 0, 0, 0.7); 
+    border-left: 5px solid #ffd700; 
+    padding: 8px 15px;
+    font-size: 1.1rem;
+    z-index: 50; 
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 12px 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 2px solid #555;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+.stat-item.selected {
+    border-color: #ffd700;
+    background-color: rgba(255, 215, 0, 0.1);
+}
+.stat-item.disabled {
+    color: #777;
+    border-color: #333;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.stat-info { flex-grow: 1; }
+.stat-info h3 { font-size: 1.4rem; font-weight: bold; }
+.stat-info p { font-size: 1rem; color: #ccc; }
+.stat-cost { text-align: right; }
+.stat-cost p { font-size: 1.3rem; font-weight: bold; color: #ffd700; }
+.stat-cost span { font-size: 1rem; color: #aaa; }
+
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+/* Tambahkan ini di style.css */
+.menu-option.disabled {
+    color: #777;
+    border-color: #444;
+    background-color: rgba(50, 50, 50, 0.3);
+    cursor: not-allowed;
+    filter: grayscale(80%); /* Efek abu-abu */
+}
+
+/* Sedikit style untuk text 'locked' */
+.lock-text {
+    font-size: 0.9em; /* Lebih kecil */
+    font-weight: bold;
+    color: #ffcc00; /* Warna kuning gembok */
+}
+
+/* Style untuk efek kilatan pada health bar */
+@keyframes flash {
+    0%, 100% { background-color: #4caf50; }
+    50% { background-color: #ff0000; }
+}
